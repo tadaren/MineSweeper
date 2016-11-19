@@ -28,7 +28,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 public class MineSweeper extends JPanel {
-
 	//ゲームの起動
 	public static void main(String[] args) {
 		if(args.length == 2){
@@ -37,7 +36,6 @@ public class MineSweeper extends JPanel {
 			new StartFrame();
 		}
 	}
-
 }
 
 //ゲーム画面のパネル
@@ -91,7 +89,13 @@ class GamePanel extends JPanel{
 		if(cheat){
 			for(int i =  0; i < fieldbase.length; i++){
 				for(int j = 0; j < fieldbase[i].length; j++){
-					System.out.print(fieldbase[i][j]);
+					if(fieldbase[i][j]==9){
+						System.out.print("*");
+					}else if(fieldbase[i][j]==0){
+						System.out.print(" ");
+					}else{
+						System.out.print(fieldbase[i][j]);
+					}
 				}
 				System.out.println();
 			}
@@ -153,15 +157,13 @@ class GamePanel extends JPanel{
 	}
 }
 
+//フィールドの1マス
 class FieldPanel extends JPanel{
 	private byte status = 0;
 	private byte value;
 
 	public FieldPanel(byte value){
 		this.value = value;
-	}
-	public byte getStatus(){
-		return status;
 	}
 	public boolean checkValue(){
 		if(value == 9){
@@ -210,6 +212,7 @@ class FieldPanel extends JPanel{
 		}
 		return count;
 	}
+	//描画
 	@Override
 	public void paintComponent(Graphics g){
 		Graphics2D g2 = (Graphics2D)g;
@@ -240,10 +243,10 @@ class FieldPanel extends JPanel{
 		}else if(status == 4){
 			g2.fill(new Ellipse2D.Double(getWidth()/5, getHeight()/5, getWidth()*3/5, getHeight()*3/5));
 		}
-
 	}
 }
 
+//ゲーム起動のフレーム
 class StartFrame extends JFrame{
 
 	private final JPanel panel;
@@ -259,17 +262,19 @@ class StartFrame extends JFrame{
 	public StartFrame(String size, String bombs){
 		this.setTitle("MineSweeper");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setBounds(10, 10, 500, 500);
+		this.setBounds(100, 30, 500, 500);
 
 		panel = new JPanel();
 		layout = new CardLayout();
 		panel.setLayout(layout);
 		JPanel startPanel = new JPanel();
 		startPanel.setLayout(null);
+
 		JLabel titlelabel = new JLabel("マインスイーパー");
 		titlelabel.setFont(new Font("MSゴシック", Font.PLAIN, 30));
 		titlelabel.setBounds(this.getWidth()/2-140, this.getHeight()/5-10, 280, 40);
 		startPanel.add(titlelabel);
+
 		JLabel label1 = new JLabel("フィールドのサイズ");
 		label1.setBounds(this.getWidth()/4-60, this.getHeight()*3/10, 120, 20);
 		startPanel.add(label1);
@@ -277,6 +282,7 @@ class StartFrame extends JFrame{
 		tf1.setBounds(this.getWidth()/4-60, this.getHeight()*2/5-10, 120, 20);
 		tf1.setHorizontalAlignment(JTextField.RIGHT);
 		startPanel.add(tf1);
+
 		JLabel label2 = new JLabel("爆弾の数");
 		label2.setBounds(this.getWidth()*3/4-40, this.getHeight()*3/10, 80, 20);
 		startPanel.add(label2);
@@ -284,6 +290,7 @@ class StartFrame extends JFrame{
 		tf2.setBounds(this.getWidth()*3/4-60, this.getHeight()*2/5, 120, 20);
 		tf2.setHorizontalAlignment(JTextField.RIGHT);
 		startPanel.add(tf2);
+
 		JButton button = new JButton("START");
 		button.setBounds(this.getWidth()/2-40, this.getHeight()/2, 80, 20);
 		button.addActionListener(new ActionListener() {
@@ -303,6 +310,7 @@ class StartFrame extends JFrame{
 			}
 		});
 		startPanel.add(button);
+
 		label = new JLabel();
 		label.setHorizontalTextPosition(JLabel.CENTER);
 		label.setBounds(this.getWidth()/2-75, this.getHeight()*4/5, 150, 20);
@@ -313,7 +321,7 @@ class StartFrame extends JFrame{
 
 		this.add(panel);
 		this.setVisible(true);
-		this.addWindowListener(new WindowAdapter() {
+		this.addWindowListener(new WindowAdapter	() {
 			@Override
 			public void windowOpened(WindowEvent e) {
 				button.requestFocusInWindow();
@@ -327,6 +335,5 @@ class StartFrame extends JFrame{
 		}else{
 			label.setText("爆弾の数が多すぎます");
 		}
-
 	}
 }
