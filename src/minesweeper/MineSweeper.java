@@ -30,10 +30,16 @@ import javax.swing.SwingUtilities;
 public class MineSweeper extends JPanel {
 	//ゲームの起動
 	public static void main(String[] args) {
+		boolean fast = false;
+		for(int i = 0; i < args.length; i++){
+			if(args[i].equals("-fast")){
+				fast = true;
+			}
+		}
 		if(args.length == 2){
-			new StartFrame(args[0],args[1]);
+			new StartFrame(args[0],args[1],fast);
 		}else{
-			new StartFrame();
+			new StartFrame(fast);
 		}
 	}
 }
@@ -255,11 +261,11 @@ class StartFrame extends JFrame{
 	private final JTextField tf2;
 	private final JLabel label;
 
-	public StartFrame(){
-		this("10","10");
+	public StartFrame(boolean b){
+		this("10","10",b);
 	}
 
-	public StartFrame(String size, String bombs){
+	public StartFrame(String size, String bombs, boolean b){
 		this.setTitle("MineSweeper");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setBounds(100, 30, 500, 500);
@@ -313,8 +319,7 @@ class StartFrame extends JFrame{
 
 		label = new JLabel();
 		label.setHorizontalTextPosition(JLabel.CENTER);
-		label.setBounds(this.getWidth()/2-75, this.getHeight()*4/5, 150, 20);
-		label.setLocation(0, 0);
+		label.setBounds(this.getWidth()/2-75, this.getHeight()*4/5-50, 300, 20);
 		startPanel.add(label);
 
 		panel.add(startPanel, "start");
@@ -327,13 +332,20 @@ class StartFrame extends JFrame{
 				button.requestFocusInWindow();
 			}
 		});
+		if(b){
+			gameStart(false);
+		}
 	}
 	public void gameStart(boolean b){
-		if(Integer.parseInt(tf1.getText())*Integer.parseInt(tf1.getText()) > Integer.parseInt(tf2.getText())){
-			panel.add(new GamePanel(Integer.parseInt(tf1.getText()),Integer.parseInt(tf2.getText()),b),"game");
-			layout.next(panel);
-		}else{
-			label.setText("爆弾の数が多すぎます");
+		try{
+			if(Integer.parseInt(tf1.getText())*Integer.parseInt(tf1.getText()) > Integer.parseInt(tf2.getText())){
+				panel.add(new GamePanel(Integer.parseInt(tf1.getText()),Integer.parseInt(tf2.getText()),b),"game");
+				layout.next(panel);
+			}else{
+				label.setText("爆弾の数が多すぎます");
+			}
+		}catch(NumberFormatException e){
+			label.setText("値を正しく入力して下さい");
 		}
 	}
 }
