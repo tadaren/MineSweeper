@@ -27,16 +27,16 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-public class MineSweeper extends JPanel {
+public class MineSweeper{
 	//ゲームの起動
 	public static void main(String[] args) {
 		boolean fast = false;
 		for(int i = 0; i < args.length; i++){
-			if(args[i].equals("-fast")){
+			if(args[i].equals("-skip")){
 				fast = true;
 			}
 		}
-		if(args.length == 2){
+		if(args.length >= 2){
 			new StartFrame(args[0],args[1],fast);
 		}else{
 			new StartFrame(fast);
@@ -45,6 +45,7 @@ public class MineSweeper extends JPanel {
 }
 
 //ゲーム画面のパネル
+@SuppressWarnings("serial")
 class GamePanel extends JPanel{
 	private int count = 0;
 	private final int maxcount;
@@ -110,12 +111,22 @@ class GamePanel extends JPanel{
 			@Override
 			public void mouseClicked(MouseEvent e){
 				Point point = e.getPoint();
-				int x = point.y*size/getHeight();
-				int y = point.x*size/getWidth();
+				FieldPanel pa = (FieldPanel)panel.getComponentAt(point);
+				int x = 0;
+				int y = 0;
+				for(int i = 0; i < field.length; i++){
+					for(int j = 0; j < field[i].length; j++){
+						if(field[i][j].equals(pa)){
+							x = i;
+							y = j;
+							break;
+						}
+					}
+				}
 				if(gameStatus){
 					if(e.getButton() == MouseEvent.BUTTON1 && !e.isShiftDown()){
 						//左クリック
-						if(field[x][y].checkValue()){
+						if(pa.checkValue()){
 							JFrame endframe = new JFrame();
 							JLabel label = new JLabel("GAMEOVER");
 							label.setHorizontalAlignment(JLabel.CENTER);
@@ -129,15 +140,23 @@ class GamePanel extends JPanel{
 									field[i][j].end(true);
 								}
 							}
+							endframe.addKeyListener(new KeyAdapter(){
+								@Override
+								public void keyTyped(KeyEvent e){
+									if(e.getKeyCode() == KeyEvent.VK_ENTER){
+										System.exit(0);
+									}
+								}
+							});
 							repaint();
 							gameStatus = false;
 						}else{
-							count += field[x][y].openField(field, x, y);
+							count += pa.openField(field, x, y);
 							panel.repaint();
 						}
 					}else if(e.getButton() == MouseEvent.BUTTON3 || e.getButton() == MouseEvent.BUTTON1 && e.isShiftDown()){
 						//右クリック
-						field[x][y].flag();
+						pa.flag();
 						panel.repaint();
 					}
 				}
@@ -147,14 +166,22 @@ class GamePanel extends JPanel{
 					label.setHorizontalAlignment(JLabel.CENTER);
 					label.setFont(new Font("MSゴシック", Font.PLAIN, 40));
 					endframe.add(label);
-					endframe.setBounds(panel.getParent().getX()+50, panel.getParent().getY()+50, 200, 150);
+					endframe.setBounds(SwingUtilities.getWindowAncestor(panel).getX()+50, SwingUtilities.getWindowAncestor(panel).getY()+50, 200, 150);
 					endframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 					endframe.setVisible(true);
 					for(int i = 0; i < field.length; i++){
 						for(int j = 0; j < field[i].length; j++){
-							field[i][j].end(false);
+							pa.end(false);
 						}
 					}
+					endframe.addKeyListener(new KeyAdapter(){
+						@Override
+						public void keyTyped(KeyEvent e) {
+							if(e.getKeyCode() == KeyEvent.VK_ENTER){
+								System.exit(0);
+							}
+						}
+					});
 					repaint();
 					gameStatus = false;
 				}
@@ -164,6 +191,7 @@ class GamePanel extends JPanel{
 }
 
 //フィールドの1マス
+@SuppressWarnings("serial")
 class FieldPanel extends JPanel{
 	private byte status = 0;
 	private byte value;
@@ -253,6 +281,7 @@ class FieldPanel extends JPanel{
 }
 
 //ゲーム起動のフレーム
+@SuppressWarnings("serial")
 class StartFrame extends JFrame{
 
 	private final JPanel panel;
